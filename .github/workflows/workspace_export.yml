@@ -1,0 +1,24 @@
+﻿name: Workspace Export
+on:
+  workflow_dispatch:
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install notion-client
+      - name: Export from Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          IFNS_Workspace_DB: ${{ secrets.IFNS_Workspace_DB }}
+        run: python scripts/workspace_export.py
+      - name: Commit snapshots
+        run: |
+          git config user.name "autobot"
+          git config user.email "autobot@users.noreply.github.com"
+          git add sync/workspace/*.csv
+          git commit -m "Workspace snapshot (manual)" || echo "nothing to commit"
+          git push
