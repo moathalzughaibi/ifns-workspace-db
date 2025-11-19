@@ -1,1 +1,3 @@
-﻿id
+﻿Due,Name,Notes,Owner,Repo Path,State,Type,id
+,Add Projects/Tasks DBs,"Next: Projects, Tasks, Decisions, Approvals, Handover.",,,Planned,Design,2b0b22c7-70d9-8172-9c8e-dc2b01a0b54b
+2025-11-19,Workspace bootstrap,Initial DB schema + exporter smoke.,,https://github.com/moathalzughaibi/ifns-workspace-db,In Review,Setup,2b0b22c7-70d9-81cd-bce3-f4142356f43f
