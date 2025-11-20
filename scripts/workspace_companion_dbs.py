@@ -18,6 +18,24 @@ def number(name):     return {name: {"number": {"format":"number"}}}
 def relation(name,dbid): return {name: {"relation": {"database_id": dbid}}}
 
 # ---- utilities
+def db_query(c: Client, database_id: str, **kwargs):
+    """SDK-agnostic DB query. Uses .databases.query if present, otherwise POSTs to /databases/{id}/query."""
+    if hasattr(c.databases, "query"):
+        return c.databases.query(database_id=database_id, **kwargs)
+    body = {}
+    for k in ("filter","sorts","start_cursor","page_size"):
+        if k in kwargs: body[k] = kwargs[k]
+    return c.request({"path": f"databases/{database_id}/query", "method": "post", "body": body})
+
+def db_list_all(c: Client, database_id: str):
+    results, cursor = [], None
+    while True:
+        resp = db_query(c, database_id, start_cursor=cursor) if cursor else db_query(c, database_id)
+        results += resp.get("results", [])
+        if not resp.get("has_more"): break
+        cursor = resp.get("next_cursor")
+    return results
+
 def ensure_page(c, parent_id, title):
     kids=c.blocks.children.list(parent_id).get("results",[])
     for k in kids:
@@ -44,10 +62,8 @@ def find_child_db_id(c, parent_page_id, candidates):
     return None
 
 def create_or_upsert_db(c, parent_page_id, candidates, props, fallback_title):
-    # try find by any accepted title variant
     dbid = find_child_db_id(c, parent_page_id, candidates)
     if dbid and not is_database(c, dbid):
-        # stale block with same title but not a real DB
         dbid = None
     if dbid is None:
         db = c.databases.create(
@@ -56,7 +72,7 @@ def create_or_upsert_db(c, parent_page_id, candidates, props, fallback_title):
             properties=props
         )
         return db["id"]
-    # upsert schema
+    # upsert missing properties
     cur = c.databases.retrieve(dbid).get("properties", {})
     add_props = {k:v for k,v in props.items() if k not in cur}
     if add_props:
@@ -64,10 +80,8 @@ def create_or_upsert_db(c, parent_page_id, candidates, props, fallback_title):
     return dbid
 
 def seed_rows(c, dbid, rows):
-    # insert only if Name not present
     existing=set()
-    q=c.databases.query(database_id=dbid)
-    for p in q.get("results",[]):
+    for p in db_list_all(c, dbid):
         t = p["properties"]["Name"]["title"]
         existing.add("".join([x.get("plain_text","") for x in t]))
     for r in rows:
@@ -90,11 +104,9 @@ def main():
     c=Client(auth=token)
     m=json.load(open(MAP,"r",encoding=ENC)); hub=m["hub_page_id"]
 
-    # ---- Admin  Config Index (tolerate title variants)
+    # tolerate title variants (dash / hyphen / spaces)
     admin_candidates = {
-        "Admin  Config Index",       # en-dash
-        "Admin - Config Index",       # hyphen
-        "Admin  Config Index"         # double-space (fallback)
+        "Admin  Config Index", "Admin - Config Index", "Admin  Config Index"
     }
     admin_props = {
       **title("Name"),
@@ -103,9 +115,7 @@ def main():
       **mselect("Domain", ["mirror","harness","reports"]),
       **rich("Notes")
     }
-    admin_db_id = create_or_upsert_db(
-        c, hub, admin_candidates, admin_props, "Admin  Config Index"
-    )
+    admin_db_id = create_or_upsert_db(c, hub, admin_candidates, admin_props, "Admin  Config Index")
 
     seed_rows(c, admin_db_id, [
       {"__title__":"Auto-refresh enabled","Key":"mirror.auto_refresh.enabled","Value":"true","Type":"bool","Domain":"mirror","Notes":"UI auto refresh"},
@@ -116,7 +126,6 @@ def main():
       {"__title__":"Daily summary enabled","Key":"reports.summary.enabled","Value":"true","Type":"bool","Domain":"reports"}
     ])
 
-    # ---- Companion DBs
     projects_id = create_or_upsert_db(c, hub, {"Projects"}, {
       **title("Name"),
       **select("Status", ["Planned","Active","On hold","Done"]),
@@ -162,9 +171,7 @@ def main():
       **relation("Workspace", root_db)
     }, "Handover")
 
-    # ---- Saved Views  Playbook (page)
     svp = ensure_page(c, hub, "Saved Views  Playbook")
-    # keep it simple: only append once if empty
     kids=c.blocks.children.list(svp).get("results",[])
     if not kids:
         c.blocks.children.append(svp, children=[
@@ -176,7 +183,6 @@ def main():
           {"object":"block","bulleted_list_item":{"rich_text":[{"type":"text","text":{"content":"Handover  filter StatusDelivered, group by Area"}}]}}
         ])
 
-    # update map
     m.update({
       "admin_config_db_id":admin_db_id,
       "projects_db_id":projects_id,
