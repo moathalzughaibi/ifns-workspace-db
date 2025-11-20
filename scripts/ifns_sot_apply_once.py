@@ -1,27 +1,25 @@
 ﻿#!/usr/bin/env python3
-import os, re, io, json, pathlib, textwrap
+import os, re, io, json, pathlib
 from notion_client import Client
 
 ENC="utf-8-sig"
 MAP="IFNS_Workspace_DB/config/workspace_companion_map.json"
 SOT="IFNS_Workspace_DB/config/.sot_mode.json"
 MAN="docs/ifns/sot/build/manifest_v1.json"
-MAX_TEXT=1800  # keep well under Notion's 2000-char limit per rich_text
+MAX_TEXT=1800  # stay under Notion's ~2000 char rich_text limit
 
 def rt(s): return [{"type":"text","text":{"content":s}}]
 
-def chunk(s, n=MAX_TEXT):
+def chunk_text(s, n=MAX_TEXT):
     s = s.replace("\r\n","\n")
-    if len(s) <= n:
-        return [s]
+    if len(s) <= n: return [s]
     out=[]
     for para in s.split("\n"):
-        if not para:
+        if para == "":
             out.append("")
             continue
         while len(para) > n:
-            # split on last space before n chars when possible
-            cut = para.rfind(" ",0,n)
+            cut = para.rfind(" ", 0, n)
             if cut < int(n*0.6): cut = n
             out.append(para[:cut].rstrip())
             para = para[cut:].lstrip()
@@ -33,7 +31,7 @@ def md_to_blocks(md_text):
     def flush():
         if not buf: return
         text = "\n".join(buf)
-        for seg in chunk(text):
+        for seg in chunk_text(text):
             blocks.append({"object":"block","paragraph":{"rich_text":rt(seg)}})
         buf.clear()
     for raw in io.StringIO(md_text):
@@ -50,7 +48,6 @@ def md_to_blocks(md_text):
     return blocks
 
 def fenced_markdown_blocks(full_md):
-    """Return list of (label_or_title, content) for ```markdown blocks"""
     out=[]; lines=full_md.splitlines(); i=0; last_label=None
     while i<len(lines):
         if lines[i].strip().startswith("###"):
@@ -78,27 +75,27 @@ def ensure_child_page(c, parent_id, title):
     return p["id"]
 
 def clear_children(c, page_id):
-    # wipe page content (so re-runs replace, not append)
     kids=c.blocks.children.list(page_id).get("results",[])
     for k in kids:
-        try:
-            c.blocks.delete(k["id"])
-        except Exception:
-            pass
+        try: c.blocks.delete(k["id"])
+        except Exception: pass
+
+def append_blocks_batched(c, page_id, blocks, batch=90):
+    for i in range(0, len(blocks), batch):
+        c.blocks.children.append(page_id, children=blocks[i:i+batch])
 
 def main():
+    # SoT guard
     mode=json.load(open(SOT,"r",encoding=ENC))
     if not mode.get("import_enabled"):
         raise SystemExit("Import disabled by SoT guard. Set import_enabled:true to bootstrap once.")
 
     m=json.load(open(MAN,"r",encoding=ENC))
-    token=os.environ["NOTION_TOKEN"]
-    if not token: raise SystemExit("Missing NOTION_TOKEN")
-    c=Client(auth=token)
+    c=Client(auth=os.environ["NOTION_TOKEN"])
 
-    wmap=json.load(open(MAP,"r",encoding=ENC))
-    hub=wmap["hub_page_id"]
+    hub=json.load(open(MAP,"r",encoding=ENC))["hub_page_id"]
 
+    # Sections
     sot_docs_pg    = ensure_child_page(c, hub, "SoT Docs")
     spine_pg       = ensure_child_page(c, hub, "14-Step Spine")
     core_ml_hub_pg = ensure_child_page(c, hub, m["sections"]["Core_ML_Phase6"]["hub_title"])
@@ -111,7 +108,7 @@ def main():
         page=ensure_child_page(c, sot_docs_pg, title)
         clear_children(c, page)
         md=open(path,"r",encoding=ENC).read()
-        c.blocks.children.append(page, children=md_to_blocks(md))
+        append_blocks_batched(c, page, md_to_blocks(md))
         print("SoT Doc ", title)
 
     # 14-Step spine
@@ -128,7 +125,7 @@ def main():
         p01 = ensure_child_page(c, step_page, "01  Narrative & Intent")
         clear_children(c, p01)
         if parent_blocks:
-            c.blocks.children.append(p01, children=parent_blocks)
+            append_blocks_batched(c, p01, parent_blocks)
 
         mstep=re.match(r"Step (\d{2})", step_title)
         nn = mstep.group(1) if mstep else "NN"
@@ -137,7 +134,7 @@ def main():
             child_title = f"{nn}.{i}  {child_title_guess or 'Section'}"
             ch = ensure_child_page(c, step_page, child_title)
             clear_children(c, ch)
-            c.blocks.children.append(ch, children=cb)
+            append_blocks_batched(c, ch, cb)
         print(f"Step  {step_title} (children: {len(child_blocks)})")
 
     # Core ML Phase 6
@@ -146,10 +143,8 @@ def main():
         phase6 = ensure_child_page(c, core_ml_hub_pg, cm["page_title"])
         clear_children(c, phase6)
         txt=open(cm["file"],"r",encoding=ENC).read()
-        note = "Related Steps: " + ", ".join([f"{n:02d}" for n in cm["related_steps"]])
-        c.blocks.children.append(phase6, children=[
-            {"object":"block","callout":{"icon":{"type":"emoji","emoji":"ℹ"},"rich_text":rt(note)}}
-        ] + md_to_blocks(txt))
+        note=[{"object":"block","callout":{"icon":{"type":"emoji","emoji":"ℹ"},"rich_text":rt("Related Steps: " + ", ".join([f"{n:02d}" for n in cm["related_steps"]]))}}]
+        append_blocks_batched(c, phase6, note + md_to_blocks(txt))
         print("Core ML Phase 6  applied")
 
     # Telemetry & QC
@@ -158,10 +153,8 @@ def main():
         qc = ensure_child_page(c, tqc_hub_pg, tq["page_title"])
         clear_children(c, qc)
         txt=open(tq["file"],"r",encoding=ENC).read()
-        note = "Related Steps: " + ", ".join([f"{n:02d}" for n in tq["related_steps"]])
-        c.blocks.children.append(qc, children=[
-            {"object":"block","callout":{"icon":{"type":"emoji","emoji":"ℹ"},"rich_text":rt(note)}}
-        ] + md_to_blocks(txt))
+        note=[{"object":"block","callout":{"icon":{"type":"emoji","emoji":"ℹ"},"rich_text":rt("Related Steps: " + ", ".join([f"{n:02d}" for n in tq["related_steps"]]))}}]
+        append_blocks_batched(c, qc, note + md_to_blocks(txt))
         print("Telemetry & QC (V1)  applied")
 
     print("Apply complete. Lock SoT next.")
