@@ -16,8 +16,7 @@ def people(n):     return {n: {"people": {}}}
 def number(n):     return {n: {"number": {"format":"number"}}}
 def relation(n,dbid): return {n: {"relation": {"database_id": dbid}}}
 
-def ensure_workspace_hub_page(c, saved_id=None, title_text="IFNS_Workspace_DB  Hub"):
-    # keep existing if it's a real page
+def ensure_workspace_hub_page(c, saved_id=None, title_text="IFNS_Workspace_DB – Hub"):
     if saved_id:
         try:
             obj=c.pages.retrieve(saved_id)
@@ -25,19 +24,14 @@ def ensure_workspace_hub_page(c, saved_id=None, title_text="IFNS_Workspace_DB  H
                 return saved_id
         except errors.APIResponseError:
             pass
-    # create top-level page in workspace
-    p=c.pages.create(
-        parent={"type":"workspace","workspace":True},
-        properties={"title":{"title":[{"type":"text","text":{"content":title_text}}]}}
-    )
+    p=c.pages.create(parent={"type":"workspace","workspace":True},
+        properties={"title":{"title":[{"type":"text","text":{"content":title_text}}]}})
     return p["id"]
 
 def create_database(c, parent_page_id, title_text, props):
-    db=c.databases.create(
-        parent={"type":"page_id","page_id":parent_page_id},
-        title=[{"type":"text","text":{"content":title_text}}],
-        properties=props
-    )
+    db=c.databases.create(parent={"type":"page_id","page_id":parent_page_id},
+                          title=[{"type":"text","text":{"content":title_text}}],
+                          properties=props)
     if db.get("object")!="database" or "properties" not in db:
         raise RuntimeError(f"Create failed for {title_text}")
     return db["id"]
@@ -48,7 +42,7 @@ def ensure_doc_page(c, parent_page_id, title):
         if k.get("type")=="child_page" and k["child_page"].get("title")==title:
             return k["id"]
     p=c.pages.create(parent={"type":"page_id","page_id":parent_page_id},
-                     properties={"title":{"title":[{"type":"text","text":{"content":title}}]}}) 
+        properties={"title":{"title":[{"type":"text","text":{"content":title}}]}})
     return p["id"]
 
 def seed_admin_rows(c, dbid):
@@ -94,11 +88,9 @@ def main():
     c=Client(auth=token)
     m=json.load(open(MAP,"r",encoding=ENC))
 
-    # 0) Workspace-level Hub PAGE (clean parent for child DBs)
     hub=ensure_workspace_hub_page(c, m.get("hub_page_id"), "IFNS_Workspace_DB  Hub")
     m["hub_page_id"]=hub
 
-    # Canonical titles (no double spaces)
     admin_title    = "Admin  Config Index (SoT)"
     projects_title = "Projects (SoT)"
     tasks_title    = "Tasks (SoT)"
@@ -106,14 +98,12 @@ def main():
     approvals_title= "Approvals (SoT)"
     handover_title = "Handover (SoT)"
 
-    # 1) Admin DB
     admin_props={**title("Name"), **rich("Key"), **rich("Value"),
                  **select("Type",["bool","int","float","string"]),
                  **mselect("Domain",["mirror","harness","reports"]), **rich("Notes")}
     admin_db_id=create_database(c, hub, admin_title, admin_props)
     seed_admin_rows(c, admin_db_id)
 
-    # 2) Companion DBs (related to Workspace)
     projects_id=create_database(c, hub, projects_title, {
       **title("Name"), **select("Status",["Planned","Active","On hold","Done"]),
       **select("Priority",["High","Medium","Low"]), **people("Owner"),
@@ -143,10 +133,8 @@ def main():
       **urlp("Link"), **relation("Project", projects_id), **relation("Workspace", root_db)
     })
 
-    # 3) Saved Views  Playbook
     svp=ensure_doc_page(c, hub, "Saved Views  Playbook")
 
-    # 4) Save map
     m.update({
       "admin_config_db_id":admin_db_id, "projects_db_id":projects_id,
       "tasks_db_id":tasks_id, "decisions_db_id":decisions_id,
