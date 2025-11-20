@@ -19,14 +19,14 @@ def relation(name,dbid): return {name: {"relation": {"database_id": dbid}}}
 
 # ---- utilities
 def db_query(c: Client, database_id: str, **kwargs):
-    """SDK-agnostic DB query. Uses .databases.query if present, otherwise POSTs to /databases/{id}/query."""
+    """SDK-agnostic DB query. Use .databases.query if available; otherwise call request(path, method, body)."""
     if hasattr(c.databases, "query"):
         return c.databases.query(database_id=database_id, **kwargs)
     body = {}
     for k in ("filter","sorts","start_cursor","page_size"):
         if k in kwargs: body[k] = kwargs[k]
-    # IMPORTANT: pass positional args, not a single dict
-    return c.request(path=f"databases/{database_id}/query", method="post", body=body)
+    # IMPORTANT: this client expects positional args, and path WITHOUT a leading slash
+    return c.request(f"databases/{database_id}/query", "post", body=body)
 
 def db_list_all(c: Client, database_id: str):
     results, cursor = [], None
@@ -104,7 +104,7 @@ def main():
     c=Client(auth=token)
     m=json.load(open(MAP,"r",encoding=ENC)); hub=m["hub_page_id"]
 
-    # tolerate title variants (en-dash, hyphen, double-space)
+    # title variants (cover en-dash, hyphen, accidental double-space)
     admin_candidates = {"Admin  Config Index", "Admin - Config Index", "Admin  Config Index"}
     admin_props = {
       **title("Name"),
