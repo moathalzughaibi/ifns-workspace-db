@@ -25,7 +25,8 @@ def db_query(c: Client, database_id: str, **kwargs):
     body = {}
     for k in ("filter","sorts","start_cursor","page_size"):
         if k in kwargs: body[k] = kwargs[k]
-    return c.request({"path": f"databases/{database_id}/query", "method": "post", "body": body})
+    # IMPORTANT: pass positional args, not a single dict
+    return c.request(path=f"databases/{database_id}/query", method="post", body=body)
 
 def db_list_all(c: Client, database_id: str):
     results, cursor = [], None
@@ -72,7 +73,6 @@ def create_or_upsert_db(c, parent_page_id, candidates, props, fallback_title):
             properties=props
         )
         return db["id"]
-    # upsert missing properties
     cur = c.databases.retrieve(dbid).get("properties", {})
     add_props = {k:v for k,v in props.items() if k not in cur}
     if add_props:
@@ -104,10 +104,8 @@ def main():
     c=Client(auth=token)
     m=json.load(open(MAP,"r",encoding=ENC)); hub=m["hub_page_id"]
 
-    # tolerate title variants (dash / hyphen / spaces)
-    admin_candidates = {
-        "Admin  Config Index", "Admin - Config Index", "Admin  Config Index"
-    }
+    # tolerate title variants (en-dash, hyphen, double-space)
+    admin_candidates = {"Admin  Config Index", "Admin - Config Index", "Admin  Config Index"}
     admin_props = {
       **title("Name"),
       **rich("Key"), **rich("Value"),
