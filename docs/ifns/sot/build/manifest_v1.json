@@ -1,0 +1,184 @@
+﻿{
+    "root":  "IFNS_Workspace_DB",
+    "hub_title":  "Workspace (DB) â€“ IFNS (Hub)",
+    "sections":  {
+                     "SoT_Docs":  [
+                                      {
+                                          "file":  "docs/ifns/sot/meta/IFNS_UI_Master_SoT_Reading_Guide_v0_1.md",
+                                          "notion_title":  "IFNS â€“ UI Master (SoT) â€“ Reading Guide"
+                                      },
+                                      {
+                                          "file":  "docs/ifns/sot/meta/IFNS_SoT_Hierarchy_and_Naming_Convention_v0_1.md",
+                                          "notion_title":  "IFNS â€“ SoT â€“ Hierarchy \u0026 Naming Convention"
+                                      },
+                                      {
+                                          "file":  "docs/ifns/sot/meta/IFNS_SoT_Missing_Assets_Report_v0_1.md",
+                                          "notion_title":  "IFNS â€“ SoT â€“ Missing / Non-Referenced Assets Report"
+                                      },
+                                      {
+                                          "file":  "docs/ifns/sot/meta/IFNS_SoT_Handover_and_Integration_Guide_v1_0.md",
+                                          "notion_title":  "IFNS â€” SoT Handover \u0026 Integration Guide (v1.0)"
+                                      },
+                                      {
+                                          "file":  "docs/ifns/sot/meta/IFNS_UI_Master_SoT_Home_Layout.md",
+                                          "notion_title":  "IFNS â€” UI Master SoT Home Layout"
+                                      }
+                                  ],
+                     "Steps":  [
+                                   {
+                                       "file":  "docs/ifns/sot/spine/Step_01_Preface_Integration_Narrative_Split_Kit.md",
+                                       "page_title":  "Step 01 â€“ Preface Integration",
+                                       "child_numbering":  "01.x",
+                                       "source_blocks":  [
+                                                             "A.Parent",
+                                                             "B.Children"
+                                                         ]
+                                   },
+                                   {
+                                       "file":  "docs/ifns/sot/spine/Step_02_Executive_Summary_Narrative_Split_Kit.md",
+                                       "page_title":  "Step 02 â€“ Executive Summary",
+                                       "child_numbering":  "02.x",
+                                       "source_blocks":  [
+                                                             "A.Parent",
+                                                             "B.Children"
+                                                         ]
+                                   },
+                                   {
+                                       "file":  "docs/ifns/sot/spine/Step_03_Visionary_Technical_Narrative_Split_Kit.md",
+                                       "page_title":  "Step 03 â€“ Visionary Technical",
+                                       "child_numbering":  "03.x",
+                                       "source_blocks":  [
+                                                             "A.Parent",
+                                                             "B.Children"
+                                                         ]
+                                   },
+                                   {
+                                       "file":  "docs/ifns/sot/spine/Step_04_Timeline_Narrative_Split_Kit.md",
+                                       "page_title":  "Step 04 â€“ Timeline",
+                                       "child_numbering":  "04.x",
+                                       "source_blocks":  [
+                                                             "A.Parent",
+                                                             "B.Children"
+                                                         ]
+                                   },
+                                   {
+                                       "file":  "docs/ifns/sot/spine/Step_05_Operational_Genesis_Narrative_Split_Kit.md",
+                                       "page_title":  "Step 05 â€“ Operational Genesis",
+                                       "child_numbering":  "05.x",
+                                       "source_blocks":  [
+                                                             "A.Parent",
+                                                             "B.Children"
+                                                         ]
+                                   },
+                                   {
+                                       "file":  "docs/ifns/sot/spine/Step_06_System_Architecture_Narrative_Split_Kit.md",
+                                       "page_title":  "Step 06 â€“ System Architecture",
+                                       "child_numbering":  "06.x",
+                                       "source_blocks":  [
+                                                             "A.Parent",
+                                                             "B.Children"
+                                                         ]
+                                   },
+                                   {
+                                       "file":  "docs/ifns/sot/spine/Step_07_DIL_Narrative_Split_Kit.md",
+                                       "page_title":  "Step 07 â€“ DIL",
+                                       "child_numbering":  "07.x",
+                                       "source_blocks":  [
+                                                             "A.Parent",
+                                                             "B.Children"
+                                                         ]
+                                   },
+                                   {
+                                       "file":  "docs/ifns/sot/spine/Step_08_MI_Narrative_Split_Kit.md",
+                                       "page_title":  "Step 08 â€“ MI",
+                                       "child_numbering":  "08.x",
+                                       "source_blocks":  [
+                                                             "A.Parent",
+                                                             "B.Children"
+                                                         ]
+                                   },
+                                   {
+                                       "file":  "docs/ifns/sot/spine/Step_09_EI_Narrative_Split_Kit.md",
+                                       "page_title":  "Step 09 â€“ EI",
+                                       "child_numbering":  "09.x",
+                                       "source_blocks":  [
+                                                             "A.Parent",
+                                                             "B.Children"
+                                                         ]
+                                   },
+                                   {
+                                       "file":  "docs/ifns/sot/spine/Step_10_MSA_Narrative_Split_Kit.md",
+                                       "page_title":  "Step 10 â€“ MSA",
+                                       "child_numbering":  "10.x",
+                                       "source_blocks":  [
+                                                             "A.Parent",
+                                                             "B.Children"
+                                                         ]
+                                   },
+                                   {
+                                       "file":  "docs/ifns/sot/spine/Step_11_MSI_Narrative_Split_Kit.md",
+                                       "page_title":  "Step 11 â€“ MSI",
+                                       "child_numbering":  "11.x",
+                                       "source_blocks":  [
+                                                             "A.Parent",
+                                                             "B.Children"
+                                                         ]
+                                   },
+                                   {
+                                       "file":  "docs/ifns/sot/spine/Step_12_DRA_Narrative_Split_Kit.md",
+                                       "page_title":  "Step 12 â€“ DRA",
+                                       "child_numbering":  "12.x",
+                                       "source_blocks":  [
+                                                             "A.Parent",
+                                                             "B.Children"
+                                                         ]
+                                   },
+                                   {
+                                       "file":  "docs/ifns/sot/spine/Step_13_SEL_Narrative_Split_Kit.md",
+                                       "page_title":  "Step 13 â€“ SEL",
+                                       "child_numbering":  "13.x",
+                                       "source_blocks":  [
+                                                             "A.Parent",
+                                                             "B.Children"
+                                                         ]
+                                   },
+                                   {
+                                       "file":  "docs/ifns/sot/spine/Step_14_Advanced_Awareness_Narrative_Split_Kit.md",
+                                       "page_title":  "Step 14 â€“ Advanced Awareness",
+                                       "child_numbering":  "14.x",
+                                       "source_blocks":  [
+                                                             "A.Parent",
+                                                             "B.Children"
+                                                         ]
+                                   }
+                               ],
+                     "Core_ML_Phase6":  {
+                                            "hub_title":  "Core ML â€“ Indicator System (Phases)",
+                                            "page_title":  "Phase 6 â€“ Implementation \u0026 Runtime Templates",
+                                            "file":  "docs/ifns/sot/kits/Core_ML_Phase6_Runtime_Templates_Split_Kit.md",
+                                            "related_steps":  [
+                                                                  7,
+                                                                  8,
+                                                                  10,
+                                                                  11,
+                                                                  12,
+                                                                  13
+                                                              ]
+                                        },
+                     "Telemetry_QC":  {
+                                          "hub_title":  "Telemetry \u0026 QC (V2 hub)",
+                                          "page_title":  "QC Weekly Telemetry V1",
+                                          "file":  "docs/ifns/sot/kits/QC_Weekly_Telemetry_V1_Spec_Kit.md",
+                                          "related_steps":  [
+                                                                12,
+                                                                13,
+                                                                14
+                                                            ]
+                                      }
+                 },
+    "notes":  [
+                  "Keep local filenames unchanged; use these canonical titles when creating Notion pages.",
+                  "For each Step kit: paste A.Parent block into \u002701 â€“ Narrative \u0026 Intent\u0027; each B.Child block into its own subpage, numbered NN.1, NN.2, â€¦",
+                  "One-time import only; after build, lock SoT to Notion and mirror back to Git via exporters."
+              ]
+}
