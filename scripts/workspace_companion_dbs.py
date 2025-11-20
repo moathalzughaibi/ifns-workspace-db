@@ -16,6 +16,22 @@ def people(n):     return {n: {"people": {}}}
 def number(n):     return {n: {"number": {"format":"number"}}}
 def relation(n,dbid): return {n: {"relation": {"database_id": dbid}}}
 
+def ensure_hub_page_under_root_db(c, root_db_id, current_hub_id=None):
+    # If we already have a hub and it's a PAGE, keep it
+    if current_hub_id:
+        try:
+            obj = c.pages.retrieve(current_hub_id)
+            if obj.get("object") == "page":
+                return current_hub_id
+        except errors.APIResponseError:
+            pass
+    # Otherwise create a new hub PAGE as a row in the root DB
+    p = c.pages.create(
+        parent={"type":"database_id","database_id":root_db_id},
+        properties={"Name":{"title":[{"type":"text","text":{"content":"Workspace (DB)  IFNS (Hub)"}}]}}
+    )
+    return p["id"]
+
 def create_database(c, parent_page_id, title_text, props):
     db=c.databases.create(
         parent={"type":"page_id","page_id":parent_page_id},
@@ -77,17 +93,20 @@ def main():
     if not token or not root_db: raise SystemExit("Missing NOTION_TOKEN/WORKSPACE_DB_ID")
     c=Client(auth=token)
     m=json.load(open(MAP,"r",encoding=ENC))
-    hub=m["hub_page_id"]
 
-    # Canonical SoT titles (unique to avoid collisions)
-    admin_title="Admin  Config Index (SoT)"
-    projects_title="Projects (SoT)"
-    tasks_title="Tasks (SoT)"
-    decisions_title="Decisions (SoT)"
-    approvals_title="Approvals (SoT)"
-    handover_title="Handover (SoT)"
+    # 0) Ensure Hub PAGE under the root DB
+    hub = ensure_hub_page_under_root_db(c, root_db, m.get("hub_page_id"))
+    m["hub_page_id"] = hub  # persist the correct hub PAGE id
 
-    # 1) Admin  Config Index
+    # Canonical titles (no double-spaces)
+    admin_title    = "Admin  Config Index (SoT)"
+    projects_title = "Projects (SoT)"
+    tasks_title    = "Tasks (SoT)"
+    decisions_title= "Decisions (SoT)"
+    approvals_title= "Approvals (SoT)"
+    handover_title = "Handover (SoT)"
+
+    # 1) Admin
     admin_props={
       **title("Name"), **rich("Key"), **rich("Value"),
       **select("Type",["bool","int","float","string"]),
@@ -97,7 +116,7 @@ def main():
     admin_db_id=create_database(c, hub, admin_title, admin_props)
     seed_admin_rows(c, admin_db_id)
 
-    # 2) Companion DBs (related to Workspace)
+    # 2) Companions (related to Workspace)
     projects_id=create_database(c, hub, projects_title, {
       **title("Name"),
       **select("Status",["Planned","Active","On hold","Done"]),
@@ -136,20 +155,10 @@ def main():
       **relation("Project", projects_id), **relation("Workspace", root_db)
     })
 
-    # 3) Saved Views  Playbook doc
+    # 3) Saved Views  Playbook
     svp=ensure_doc_page(c, hub, "Saved Views  Playbook")
-    kids=c.blocks.children.list(svp).get("results",[])
-    if not kids:
-        c.blocks.children.append(svp, children=[
-          {"object":"block","heading_2":{"rich_text":[{"type":"text","text":{"content":"How to use the saved views (quick tips)"}}]}},
-          {"object":"block","bulleted_list_item":{"rich_text":[{"type":"text","text":{"content":"Projects  Status=Active; sort Priority; group by Tags"}}]}},
-          {"object":"block","bulleted_list_item":{"rich_text":[{"type":"text","text":{"content":"Tasks  StatusDone; sort Due asc; group by Project"}}]}},
-          {"object":"block","bulleted_list_item":{"rich_text":[{"type":"text","text":{"content":"Decisions  Status=Proposed; group by Project"}}]}},
-          {"object":"block","bulleted_list_item":{"rich_text":[{"type":"text","text":{"content":"Approvals  Status=Pending; sort Date desc"}}]}},
-          {"object":"block","bulleted_list_item":{"rich_text":[{"type":"text","text":{"content":"Handover  StatusDelivered; group by Area"}}]}}
-        ])
 
-    # 4) Write IDs to the map
+    # 4) Save all IDs
     m.update({
       "admin_config_db_id":admin_db_id,
       "projects_db_id":projects_id,
@@ -160,6 +169,6 @@ def main():
       "saved_views_playbook_page_id":svp
     })
     pathlib.Path(OUT).write_text(json.dumps(m,indent=2), encoding=ENC)
-    print("OK: Fresh SoT DBs created under Hub; map updated")
+    print("OK: Hub page ensured + SoT DBs created + Playbook; map updated")
 if __name__=="__main__":
     main()
