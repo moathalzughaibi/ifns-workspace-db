@@ -16,19 +16,19 @@ def people(n):     return {n: {"people": {}}}
 def number(n):     return {n: {"number": {"format":"number"}}}
 def relation(n,dbid): return {n: {"relation": {"database_id": dbid}}}
 
-def ensure_hub_page_under_root_db(c, root_db_id, current_hub_id=None):
-    # If we already have a hub and it's a PAGE, keep it
-    if current_hub_id:
+def ensure_workspace_hub_page(c, saved_id=None, title_text="IFNS_Workspace_DB  Hub"):
+    # keep existing if it's a real page
+    if saved_id:
         try:
-            obj = c.pages.retrieve(current_hub_id)
-            if obj.get("object") == "page":
-                return current_hub_id
+            obj=c.pages.retrieve(saved_id)
+            if obj.get("object")=="page":
+                return saved_id
         except errors.APIResponseError:
             pass
-    # Otherwise create a new hub PAGE as a row in the root DB
-    p = c.pages.create(
-        parent={"type":"database_id","database_id":root_db_id},
-        properties={"Name":{"title":[{"type":"text","text":{"content":"Workspace (DB)  IFNS (Hub)"}}]}}
+    # create top-level page in workspace
+    p=c.pages.create(
+        parent={"type":"workspace","workspace":True},
+        properties={"title":{"title":[{"type":"text","text":{"content":title_text}}]}}
     )
     return p["id"]
 
@@ -48,7 +48,7 @@ def ensure_doc_page(c, parent_page_id, title):
         if k.get("type")=="child_page" and k["child_page"].get("title")==title:
             return k["id"]
     p=c.pages.create(parent={"type":"page_id","page_id":parent_page_id},
-                     properties={"title":{"title":[{"type":"text","text":{"content":title}}]}})
+                     properties={"title":{"title":[{"type":"text","text":{"content":title}}]}}) 
     return p["id"]
 
 def seed_admin_rows(c, dbid):
@@ -94,11 +94,11 @@ def main():
     c=Client(auth=token)
     m=json.load(open(MAP,"r",encoding=ENC))
 
-    # 0) Ensure Hub PAGE under the root DB
-    hub = ensure_hub_page_under_root_db(c, root_db, m.get("hub_page_id"))
-    m["hub_page_id"] = hub  # persist the correct hub PAGE id
+    # 0) Workspace-level Hub PAGE (clean parent for child DBs)
+    hub=ensure_workspace_hub_page(c, m.get("hub_page_id"), "IFNS_Workspace_DB  Hub")
+    m["hub_page_id"]=hub
 
-    # Canonical titles (no double-spaces)
+    # Canonical titles (no double spaces)
     admin_title    = "Admin  Config Index (SoT)"
     projects_title = "Projects (SoT)"
     tasks_title    = "Tasks (SoT)"
@@ -106,69 +106,54 @@ def main():
     approvals_title= "Approvals (SoT)"
     handover_title = "Handover (SoT)"
 
-    # 1) Admin
-    admin_props={
-      **title("Name"), **rich("Key"), **rich("Value"),
-      **select("Type",["bool","int","float","string"]),
-      **mselect("Domain",["mirror","harness","reports"]),
-      **rich("Notes")
-    }
+    # 1) Admin DB
+    admin_props={**title("Name"), **rich("Key"), **rich("Value"),
+                 **select("Type",["bool","int","float","string"]),
+                 **mselect("Domain",["mirror","harness","reports"]), **rich("Notes")}
     admin_db_id=create_database(c, hub, admin_title, admin_props)
     seed_admin_rows(c, admin_db_id)
 
-    # 2) Companions (related to Workspace)
+    # 2) Companion DBs (related to Workspace)
     projects_id=create_database(c, hub, projects_title, {
-      **title("Name"),
-      **select("Status",["Planned","Active","On hold","Done"]),
-      **select("Priority",["High","Medium","Low"]),
-      **people("Owner"), **datep("Start"), **datep("End"),
-      **mselect("Tags",["SoT","UX","Runtime","Telemetry","DB"]),
+      **title("Name"), **select("Status",["Planned","Active","On hold","Done"]),
+      **select("Priority",["High","Medium","Low"]), **people("Owner"),
+      **datep("Start"), **datep("End"), **mselect("Tags",["SoT","UX","Runtime","Telemetry","DB"]),
       **rich("Description"), **relation("Workspace", root_db)
     })
     tasks_id=create_database(c, hub, tasks_title, {
-      **title("Name"),
-      **select("Status",["Not Started","In Progress","Blocked","Done"]),
-      **select("Priority",["High","Medium","Low"]),
-      **people("Assignee"), **datep("Due"),
+      **title("Name"), **select("Status",["Not Started","In Progress","Blocked","Done"]),
+      **select("Priority",["High","Medium","Low"]), **people("Assignee"), **datep("Due"),
       **relation("Project", projects_id), **relation("Workspace", root_db),
       **mselect("Tags",["SoT","UX","Runtime","Telemetry","DB"])
     })
     decisions_id=create_database(c, hub, decisions_title, {
-      **title("Decision"),
-      **select("Status",["Proposed","Approved","Rejected","Changed"]),
-      **datep("Date"), **people("Owner"),
-      **relation("Project", projects_id), **relation("Workspace", root_db),
-      **rich("Notes")
+      **title("Decision"), **select("Status",["Proposed","Approved","Rejected","Changed"]),
+      **datep("Date"), **people("Owner"), **relation("Project", projects_id),
+      **relation("Workspace", root_db), **rich("Notes")
     })
     approvals_id=create_database(c, hub, approvals_title, {
-      **title("Request"),
-      **select("Status",["Pending","Approved","Denied"]),
+      **title("Request"), **select("Status",["Pending","Approved","Denied"]),
       **datep("Date"), **rich("RequestedBy"), **rich("ApprovedBy"),
       **relation("Project", projects_id), **relation("Decision", decisions_id),
       **relation("Workspace", root_db)
     })
     handover_id=create_database(c, hub, handover_title, {
-      **title("Item"),
-      **select("Area",["Docs","ETL","Runtime","UX/SxE","QC/Telemetry"]),
-      **select("Status",["Pending","Ready","Delivered"]),
-      **datep("Due"), **people("Owner"), **urlp("Link"),
-      **relation("Project", projects_id), **relation("Workspace", root_db)
+      **title("Item"), **select("Area",["Docs","ETL","Runtime","UX/SxE","QC/Telemetry"]),
+      **select("Status",["Pending","Ready","Delivered"]), **datep("Due"), **people("Owner"),
+      **urlp("Link"), **relation("Project", projects_id), **relation("Workspace", root_db)
     })
 
     # 3) Saved Views  Playbook
     svp=ensure_doc_page(c, hub, "Saved Views  Playbook")
 
-    # 4) Save all IDs
+    # 4) Save map
     m.update({
-      "admin_config_db_id":admin_db_id,
-      "projects_db_id":projects_id,
-      "tasks_db_id":tasks_id,
-      "decisions_db_id":decisions_id,
-      "approvals_db_id":approvals_id,
-      "handover_db_id":handover_id,
+      "admin_config_db_id":admin_db_id, "projects_db_id":projects_id,
+      "tasks_db_id":tasks_id, "decisions_db_id":decisions_id,
+      "approvals_db_id":approvals_id, "handover_db_id":handover_id,
       "saved_views_playbook_page_id":svp
     })
     pathlib.Path(OUT).write_text(json.dumps(m,indent=2), encoding=ENC)
-    print("OK: Hub page ensured + SoT DBs created + Playbook; map updated")
+    print("OK: Workspace Hub + SoT DBs + Playbook created; map updated")
 if __name__=="__main__":
     main()
