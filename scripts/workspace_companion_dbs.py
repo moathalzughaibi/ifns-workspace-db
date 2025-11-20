@@ -1,12 +1,11 @@
 ﻿#!/usr/bin/env python3
-import os, json, pathlib
+import os, json, pathlib, re
 from notion_client import Client, errors
 
 ENC="utf-8-sig"
 MAP="IFNS_Workspace_DB/config/workspace_companion_map.json"
 OUT=MAP
 
-# ---- property helpers
 def title(n):      return {n: {"title": {}}}
 def rich(n):       return {n: {"rich_text": {}}}
 def select(n,ops): return {n: {"select": {"options":[{"name":o} for o in ops]}}}
@@ -29,21 +28,29 @@ def ensure_page(c, parent_id, title):
 def is_database(c, dbid):
     try:
         obj=c.databases.retrieve(dbid)
-        return isinstance(obj, dict) and "properties" in obj
+        return isinstance(obj, dict) and obj.get("object")=="database" and "properties" in obj
     except errors.APIResponseError:
         return False
 
-def find_child_db_id(c, parent_page_id, titles:set):
+# normalize titles to tolerate en-dash/hyphen/double-spaces
+def norm(s:str)->str:
+    if not s: return ""
+    s = re.sub(r"[\-]+","-", s)     # dash family -> hyphen
+    s = re.sub(r"\s+"," ", s).strip() # collapse spaces
+    return s.lower()
+
+def find_child_db_id(c, parent_page_id, candidates:set):
+    norm_cands = {norm(x) for x in candidates}
     kids=c.blocks.children.list(parent_page_id).get("results",[])
     for k in kids:
         if k.get("type")=="child_database":
-            t=k["child_database"].get("title")
-            if t in titles:
+            t = k["child_database"].get("title","")
+            if norm(t) in norm_cands:
                 return k["id"]
     return None
 
-def create_or_upsert_db(c, parent_page_id, titles:set, desired_props:dict, fallback_title:str):
-    dbid = find_child_db_id(c, parent_page_id, titles)
+def create_or_upsert_db(c, parent_page_id, candidates:set, desired_props:dict, fallback_title:str):
+    dbid = find_child_db_id(c, parent_page_id, candidates)
     if dbid and not is_database(c, dbid):
         dbid=None
     if dbid is None:
@@ -53,7 +60,7 @@ def create_or_upsert_db(c, parent_page_id, titles:set, desired_props:dict, fallb
             properties=desired_props
         )
         return db["id"]
-    # force-upsert: add any missing props
+    # upsert any missing properties
     cur = c.databases.retrieve(dbid)["properties"]
     missing = {k:v for k,v in desired_props.items() if k not in cur}
     if missing:
@@ -61,68 +68,58 @@ def create_or_upsert_db(c, parent_page_id, titles:set, desired_props:dict, fallb
     return dbid
 
 def build_prop_value(db_props:dict, key:str, value):
-    """Map a Python value into a Notion property payload using the DB's real schema."""
-    p = db_props.get(key)
-    if not p: return None  # unknown prop  skip
-    t = p["type"]
-    if t=="title":
-        return {"title":[{"type":"text","text":{"content":str(value)}}]}
-    if t=="rich_text":
-        return {"rich_text":[{"type":"text","text":{"content":str(value)}}]}
-    if t=="number":
-        try: num = float(value); 
+    p = db_props.get(key);  t = p["type"] if p else None
+    if   t=="title":       return {"title":[{"type":"text","text":{"content":str(value)}}]}
+    elif t=="rich_text":   return {"rich_text":[{"type":"text","text":{"content":str(value)}}]}
+    elif t=="number":
+        try: num=float(value)
         except: return None
-        return {"number": num}
-    if t=="select":
-        return {"select":{"name": str(value)}}
-    if t=="multi_select":
-        # allow comma or list
-        names = value if isinstance(value, list) else [s.strip() for s in str(value).split(",") if s.strip()]
-        return {"multi_select":[{"name": n} for n in names]}
-    if t=="url":
-        return {"url": str(value)}
-    if t=="date":
-        # accept ISO date string
-        return {"date":{"start": str(value)}}
-    if t=="people":
-        # leave empty unless you want to resolve users
-        return None
-    if t=="relation":
-        # skip; relations are user-linked later
-        return None
+        return {"number":num}
+    elif t=="select":      return {"select":{"name":str(value)}}
+    elif t=="multi_select":
+        names = value if isinstance(value,list) else [s.strip() for s in str(value).split(",") if s.strip()]
+        return {"multi_select":[{"name":n} for n in names]}
+    elif t=="url":         return {"url":str(value)}
+    elif t=="date":        return {"date":{"start":str(value)}}
+    # people/relation: skip (set manually)
     return None
 
 def seed_rows_schema_aware(c, dbid, rows):
-    db_props = c.databases.retrieve(dbid)["properties"]
+    db = c.databases.retrieve(dbid)
+    if db.get("object")!="database" or "properties" not in db:
+        raise RuntimeError(f"Not a database id: {dbid}")
+    db_props = db["properties"]
     for r in rows:
-        props={}
-        # title first
-        props["Name"] = {"title":[{"type":"text","text":{"content": r.get("__title__","")}}]}
+        props={"Name":{"title":[{"type":"text","text":{"content": r.get("__title__","")}}]}}
         for k,v in r.items():
             if k=="__title__": continue
-            pv = build_prop_value(db_props, k, v)
-            if pv is not None:
-                props[k]=pv
+            pv=build_prop_value(db_props,k,v)
+            if pv is not None: props[k]=pv
         c.pages.create(parent={"type":"database_id","database_id":dbid}, properties=props)
 
 def main():
     token=os.environ["NOTION_TOKEN"]; root_db=os.environ["WORKSPACE_DB_ID"]
     if not token or not root_db: raise SystemExit("Missing NOTION_TOKEN/WORKSPACE_DB_ID")
-    c=Client(auth=token)
-    m=json.load(open(MAP,"r",encoding=ENC)); hub=m["hub_page_id"]
+    c=Client(auth=token); m=json.load(open(MAP,"r",encoding=ENC)); hub=m["hub_page_id"]
 
-    # ---- Admin  Config Index (accept common title variants)
-    admin_titles={"Admin  Config Index","Admin - Config Index","Admin  Config Index"}
+    # --- Admin  Config Index
+    admin_variants={"Admin  Config Index","Admin - Config Index","Admin  Config Index"}
+    admin_title   ="Admin  Config Index"
     admin_props={
-      **title("Name"),
-      **rich("Key"), **rich("Value"),
+      **title("Name"), **rich("Key"), **rich("Value"),
       **select("Type",["bool","int","float","string"]),
       **mselect("Domain",["mirror","harness","reports"]),
       **rich("Notes")
     }
-    admin_db_id=create_or_upsert_db(c, hub, admin_titles, admin_props, "Admin  Config Index")
+    admin_db_id=create_or_upsert_db(c, hub, admin_variants, admin_props, admin_title)
+    if not is_database(c, admin_db_id):
+        # recreate with canonical title if we matched a stale block
+        admin_db_id = c.databases.create(
+            parent={"type":"page_id","page_id":hub},
+            title=[{"type":"text","text":{"content":admin_title}}],
+            properties=admin_props
+        )["id"]
 
-    # seed rows using the DB's real property types
     seed_rows_schema_aware(c, admin_db_id, [
       {"__title__":"Auto-refresh enabled","Key":"mirror.auto_refresh.enabled","Value":"true","Type":"bool","Domain":["mirror"],"Notes":"UI auto refresh"},
       {"__title__":"Auto-refresh interval (s)","Key":"mirror.auto_refresh.interval_s","Value":"3","Type":"int","Domain":["mirror"]},
@@ -132,55 +129,41 @@ def main():
       {"__title__":"Daily summary enabled","Key":"reports.summary.enabled","Value":"true","Type":"bool","Domain":["reports"]}
     ])
 
-    # ---- Companion DBs
-    projects_id=create_or_upsert_db(c, hub, {"Projects"}, {
-      **title("Name"),
-      **select("Status",["Planned","Active","On hold","Done"]),
-      **select("Priority",["High","Medium","Low"]),
-      **people("Owner"), **datep("Start"), **datep("End"),
-      **mselect("Tags",["SoT","UX","Runtime","Telemetry","DB"]),
+    # --- Companion DBs (same as before)
+    projects_id = create_or_upsert_db(c, hub, {"Projects"}, {
+      **title("Name"), **select("Status",["Planned","Active","On hold","Done"]),
+      **select("Priority",["High","Medium","Low"]), **people("Owner"),
+      **datep("Start"), **datep("End"), **mselect("Tags",["SoT","UX","Runtime","Telemetry","DB"]),
       **rich("Description"), **relation("Workspace", root_db)
     }, "Projects")
 
-    tasks_id=create_or_upsert_db(c, hub, {"Tasks"}, {
-      **title("Name"),
-      **select("Status",["Not Started","In Progress","Blocked","Done"]),
-      **select("Priority",["High","Medium","Low"]),
-      **people("Assignee"), **datep("Due"),
-      **relation("Project", projects_id),
-      **relation("Workspace", root_db),
+    tasks_id = create_or_upsert_db(c, hub, {"Tasks"}, {
+      **title("Name"), **select("Status",["Not Started","In Progress","Blocked","Done"]),
+      **select("Priority",["High","Medium","Low"]), **people("Assignee"), **datep("Due"),
+      **relation("Project", projects_id), **relation("Workspace", root_db),
       **mselect("Tags",["SoT","UX","Runtime","Telemetry","DB"])
     }, "Tasks")
 
-    decisions_id=create_or_upsert_db(c, hub, {"Decisions"}, {
-      **title("Decision"),
-      **select("Status",["Proposed","Approved","Rejected","Changed"]),
+    decisions_id = create_or_upsert_db(c, hub, {"Decisions"}, {
+      **title("Decision"), **select("Status",["Proposed","Approved","Rejected","Changed"]),
       **datep("Date"), **people("Owner"),
-      **relation("Project", projects_id),
-      **relation("Workspace", root_db),
-      **rich("Notes")
+      **relation("Project", projects_id), **relation("Workspace", root_db), **rich("Notes")
     }, "Decisions")
 
-    approvals_id=create_or_upsert_db(c, hub, {"Approvals"}, {
-      **title("Request"),
-      **select("Status",["Pending","Approved","Denied"]),
+    approvals_id = create_or_upsert_db(c, hub, {"Approvals"}, {
+      **title("Request"), **select("Status",["Pending","Approved","Denied"]),
       **datep("Date"), **rich("RequestedBy"), **rich("ApprovedBy"),
-      **relation("Project", projects_id),
-      **relation("Decision", decisions_id),
-      **relation("Workspace", root_db)
+      **relation("Project", projects_id), **relation("Decision", decisions_id), **relation("Workspace", root_db)
     }, "Approvals")
 
-    handover_id=create_or_upsert_db(c, hub, {"Handover"}, {
-      **title("Item"),
-      **select("Area",["Docs","ETL","Runtime","UX/SxE","QC/Telemetry"]),
-      **select("Status",["Pending","Ready","Delivered"]),
-      **datep("Due"), **people("Owner"), **urlp("Link"),
-      **relation("Project", projects_id),
-      **relation("Workspace", root_db)
+    handover_id = create_or_upsert_db(c, hub, {"Handover"}, {
+      **title("Item"), **select("Area",["Docs","ETL","Runtime","UX/SxE","QC/Telemetry"]),
+      **select("Status",["Pending","Ready","Delivered"]), **datep("Due"), **people("Owner"), **urlp("Link"),
+      **relation("Project", projects_id), **relation("Workspace", root_db)
     }, "Handover")
 
-    # ---- Saved Views  Playbook (doc)
-    svp=ensure_page(c, hub, "Saved Views  Playbook")
+    # Saved Views  Playbook (doc)
+    svp = ensure_page(c, hub, "Saved Views  Playbook")
     kids=c.blocks.children.list(svp).get("results",[])
     if not kids:
         c.blocks.children.append(svp, children=[
@@ -192,7 +175,7 @@ def main():
           {"object":"block","bulleted_list_item":{"rich_text":[{"type":"text","text":{"content":"Handover  StatusDelivered; group by Area"}}]}}
         ])
 
-    # map update
+    # update map
     m.update({
       "admin_config_db_id":admin_db_id,
       "projects_db_id":projects_id,
@@ -203,6 +186,6 @@ def main():
       "saved_views_playbook_page_id":svp
     })
     pathlib.Path(OUT).write_text(json.dumps(m,indent=2), encoding=ENC)
-    print("OK: Admin Config (schema-upsert + schema-aware seed) + companion DBs + Playbook created & map updated")
+    print("OK: Admin Config verified/recreated + companion DBs + Playbook wired")
 if __name__=="__main__":
     main()
