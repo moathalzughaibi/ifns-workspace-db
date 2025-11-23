@@ -29,17 +29,17 @@ Each of these files defines a **parent** `01 – Narrative & Intent` page and it
 - `Step_13_SEL_Narrative_Split_Kit.md` – Step 13 (SEL)
 - `Step_14_Advanced_Awareness_Narrative_Split_Kit.md` – Step 14 (Advanced Awareness)
 ### 1.2 Core ML – Phase 6 runtime templates
-- `Core_ML_Phase6_Runtime_Templates_Split_Kit.md`  
+- `Core_ML_Phase6_Runtime_Templates_Split_Kit.md`
   Defines the parent and child pages for **Core ML – Phase 6 – Implementation & Runtime Templates**, including indicator engines, feature services, backfill/recalc, and monitoring/telemetry templates.
 ### 1.3 Telemetry & QC – QC Weekly spec
-- `QC_Weekly_Telemetry_V1_Spec_Kit.md`  
+- `QC_Weekly_Telemetry_V1_Spec_Kit.md`
   Converts `QC_Weekly_Telemetry_V1.md` from the repo into a Notion-ready **QC Weekly Telemetry V1** page, with meta, design goals, emit guidance, and relationships to other telemetry assets.
 ### 1.4 Global helpers for the SoT
-- `IFNS_UI_Master_SoT_Reading_Guide_v0_1.md`  
+- `IFNS_UI_Master_SoT_Reading_Guide_v0_1.md`
   Reading guide explaining the overall structure (14-step spine, Indicator System, Telemetry, SxE), and giving tailored itineraries for Executives, ML/Eng, SxE/UX, and Ops/Risk.
-- `IFNS_SoT_Hierarchy_and_Naming_Convention_v0_1.md`  
+- `IFNS_SoT_Hierarchy_and_Naming_Convention_v0_1.md`
   Defines the naming rules for steps, sub-steps (NN.x), and cross-cutting hubs like Indicator System, Telemetry & QC, and Runtime Calendars.
-- `IFNS_SoT_Missing_Assets_Report_v0_1.md`  
+- `IFNS_SoT_Missing_Assets_Report_v0_1.md`
   Lists repo files (docs, schemas, data) that are **not explicitly referenced** in the SoT kits, grouped by category. This is the canonical list to decide what to import later vs. archive.
 ---
 ## 2. Notion integration plan (for the new agent)

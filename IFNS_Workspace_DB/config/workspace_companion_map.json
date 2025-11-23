@@ -5,5 +5,21 @@
   "Decisions": "a507e981-63a0-416e-a6af-ad49abbe6e6e",
   "Approvals": "095033f4-11bb-4be3-97a5-01e981f922ab",
   "Handover": "b1f60be2-ea60-405e-a002-9e06a4ab99f7",
-  "Admin_Config_Index": "9cfb4ced-a2a0-46d2-b41d-728b4dee5df4"
+  "Admin_Config_Index": "9cfb4ced-a2a0-46d2-b41d-728b4dee5df4",
+  "db_host_page_id": "2b1b22c7-70d9-81e0-b65a-eb865bd29e2b",
+  "Backtest_Results": "2b4b22c7-70d9-81bd-a718-f7a58196317c",
+  "Feature_Views": "2b4b22c7-70d9-81ca-8c6f-d79b9a6c2d94",
+  "Feature_Schema": "2b4b22c7-70d9-81ac-b8b2-e4bb40419e85",
+  "Execution_API_Log": "2b4b22c7-70d9-81d7-9174-cb7a529e3dba",
+  "Experiment_Logs": "2b4b22c7-70d9-81bc-aa63-c66d0b3f054a",
+  "Feature_Family_Map": "2b4b22c7-70d9-8163-9809-f266ca3b1cdc",
+  "Feature_Policy_Matrix": "2b4b22c7-70d9-81ea-ab5b-ea7b25858489",
+  "Indicators_L1_Catalog": "2b4b22c7-70d9-81cc-8ae5-d3ec029b2e75",
+  "Indicators_L2L3_Catalog": "2b4b22c7-70d9-8195-ba9b-f4af50b6f3d6",
+  "Indicators_Universe": "2b4b22c7-70d9-81f8-86cc-d4ce54223385",
+  "QC_Lint_Report": "2b4b22c7-70d9-8112-8ebb-ce8d2d654553",
+  "Model_Registry": "2b4b22c7-70d9-816f-b9a1-d0c746321d27",
+  "Portfolio_Matrix": "2b4b22c7-70d9-8184-b2d9-c5717f2c278e",
+  "RiskAPI_Alerts": "2b4b22c7-70d9-812a-91a0-d0508e9f1525",
+  "System_Layers_Tracker": "2b4b22c7-70d9-81fe-9d64-fbfa8c53a82a"
 }

@@ -1,5 +1,6 @@
 ﻿from notion_client import Client
-import os, sys
+import os
+
 tok = os.environ.get("NOTION_TOKEN")
 dbid_env = os.environ.get("WORKSPACE_DB_ID") or os.environ.get("IFNS_Workspace_DB")
 c = Client(auth=tok)
@@ -16,8 +17,10 @@ except Exception as e:
 
 # If failed, search for likely databases by title
 if not ok:
-    hits = c.search(query="IFNS_Workspace_DB", filter={"property":"object","value":"database"})
+    hits = c.search(
+        query="IFNS_Workspace_DB", filter={"property": "object", "value": "database"}
+    )
     print("Search results:")
-    for o in hits.get("results",[]):
-        ttl = o.get("title",[{"plain_text":"(untitled)"}])[0]["plain_text"]
+    for o in hits.get("results", []):
+        ttl = o.get("title", [{"plain_text": "(untitled)"}])[0]["plain_text"]
         print(" -", ttl, "", o["id"])

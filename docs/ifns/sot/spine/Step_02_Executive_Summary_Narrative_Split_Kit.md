@@ -46,7 +46,7 @@ Each child page should appear as a Notion subpage under this one.
   - What IFNS is (at the product/system level).
   - Which major components it has (DIL, MI, EI, MSI, DRA, SEL, Awareness layers).
   - How it will be controlled and observed (Admin Console, Awareness Mirror).
-- Connects **business outcomes** (risk-adjusted returns, stability, governance)  
+- Connects **business outcomes** (risk-adjusted returns, stability, governance)
   with **technical strategy** (ML models, telemetry, backtesting, paper/live).
 ```
 
@@ -93,16 +93,16 @@ Each child page should appear as a Notion subpage under this one.
 
 A suggested executive summary layout:
 
-1. **What IFNS is**  
+1. **What IFNS is**
    - A neural system for financial decision-making and automation.
-2. **Why it is being built**  
+2. **Why it is being built**
    - Improve decision quality, stability, and transparency vs. ad-hoc/manual trading.
-3. **How it works (at a high level)**  
+3. **How it works (at a high level)**
    - Data  Models  Decisions  Execution  Learning & Awareness.
-4. **What success looks like**  
-   - Stable risk-adjusted performance, explainable behavior, controlled risk,  
+4. **What success looks like**
+   - Stable risk-adjusted performance, explainable behavior, controlled risk,
      fast iteration with strong guardrails.
-5. **How it will be operated safely**  
+5. **How it will be operated safely**
    - Clear control panel, incident logging, readiness scoring, and human override.
 
 ---

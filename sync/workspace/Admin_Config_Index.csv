@@ -1,1 +1,11 @@
-﻿id
+Category,Date,Name,Notes,Place,Scope,Type,Updated,Value,Workspace,_page_id
+,,mirror.auto_refresh.interval_s,Mirror refresh interval (s),,mirror,number,,3,,2b3b22c7-70d9-8141-8ded-c4d9a321376b
+,,harness.runs.min_minutes,Minimum demo run minutes,,harness,number,,10,,2b3b22c7-70d9-8147-94a2-d7eeb864519b
+naming,,Naming  Steps,,,,,2025-11-22,Step NN  <token>; 01  Narrative & Intent; NN.k – Section k,,2b3b22c7-70d9-814b-96ab-f46b72f9f682
+,,harness.route.default,Default execution route,,harness,text,,vwap,,2b3b22c7-70d9-8162-9695-edcd35b5e427
+,,mirror.auto_refresh.enabled,Auto-refresh in Awareness Mirror,,mirror,bool,,true,,2b3b22c7-70d9-8195-98a5-cd11e6b196c0
+,,reports.summary.enabled,Emit daily summary NDJSON,,reports,bool,,true,,2b3b22c7-70d9-819e-941b-e0391a7a4cbb
+mirror,,Export  Mirror Path,,,,,2025-11-22,sync/workspace/*.csv,,2b3b22c7-70d9-81ab-9163-f2b0abca27f4
+sla,,SLA  Approvals,,,,,2025-11-22,Target 48h pending  breach,,2b3b22c7-70d9-81b7-a3e2-c9c1c2b81690
+ids,,Workspace Root DB,,,,,2025-11-22,2b0b22c770d980578b64eb9a7a394901,,2b3b22c7-70d9-81dc-8bf4-f9e7dc1be310
+,,harness.replay.speed,Replay speed multiplier,,harness,number,,1.0,,2b3b22c7-70d9-81ea-8ca1-c0db04c0106b

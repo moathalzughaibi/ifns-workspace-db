@@ -16,7 +16,7 @@ In Notion, keep `01 – Narrative & Intent` as a short overview and index page. 
 
 This step defines **Modeling Intelligence (MI)** — the cognitive heart of IFNS.
 
-MI is responsible for turning the rich representations produced by DIL into actionable signals, 
+MI is responsible for turning the rich representations produced by DIL into actionable signals,
 scores, and decisions, governed by clear contracts and promotion rules.
 
 

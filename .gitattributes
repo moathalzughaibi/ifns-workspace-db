@@ -1,0 +1,7 @@
+﻿# default: text auto-normalize
+* text=auto
+# force LF for code/docs
+*.py text eol=lf
+*.md text eol=lf
+# keep PS on CRLF
+*.ps1 text eol=crlf

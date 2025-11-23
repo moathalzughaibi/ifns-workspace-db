@@ -42,9 +42,9 @@ In Notion, use a three-column layout. Example content:
 
 **Column 1 – Start here**
 
-- [Step 01 – Preface Integration](…)  
-- [Step 02 – Executive Summary](…)  
-- [Step 03 – Visionary–Technical Overview](…)  
+- [Step 01 – Preface Integration](…)
+- [Step 02 – Executive Summary](…)
+- [Step 03 – Visionary–Technical Overview](…)
 - [IFNS – Notion Page Index (historical)](…)
 
 

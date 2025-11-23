@@ -1,136 +1,182 @@
 ﻿#!/usr/bin/env python3
-import os, re, io, json, pathlib
+import os
+import re
+import io
+import json
+import pathlib
 from notion_client import Client
 
-ENC="utf-8-sig"
-MAP="IFNS_Workspace_DB/config/workspace_companion_map.json"
-SOT="IFNS_Workspace_DB/config/.sot_mode.json"
-MAN="docs/ifns/sot/build/manifest_v1.json"
-MAX_TEXT=1800  # stay under Notion's ~2000 char rich_text limit
+ENC = "utf-8-sig"
+MAP = "IFNS_Workspace_DB/config/workspace_companion_map.json"
+SOT = "IFNS_Workspace_DB/config/.sot_mode.json"
+MAN = "docs/ifns/sot/build/manifest_v1.json"
+MAX_TEXT = 1800  # stay under Notion's ~2000 char rich_text limit
 
-def rt(s): return [{"type":"text","text":{"content":s}}]
+
+def rt(s):
+    return [{"type": "text", "text": {"content": s}}]
+
 
 def chunk_text(s, n=MAX_TEXT):
-    s = s.replace("\r\n","\n")
-    if len(s) <= n: return [s]
-    out=[]
+    s = s.replace("\r\n", "\n")
+    if len(s) <= n:
+        return [s]
+    out = []
     for para in s.split("\n"):
         if para == "":
             out.append("")
             continue
         while len(para) > n:
             cut = para.rfind(" ", 0, n)
-            if cut < int(n*0.6): cut = n
+            if cut < int(n * 0.6):
+                cut = n
             out.append(para[:cut].rstrip())
             para = para[cut:].lstrip()
         out.append(para)
     return out
 
+
 def md_to_blocks(md_text):
-    blocks=[]; buf=[]
+    blocks = []
+    buf = []
+
     def flush():
-        if not buf: return
+        if not buf:
+            return
         text = "\n".join(buf)
         for seg in chunk_text(text):
-            blocks.append({"object":"block","paragraph":{"rich_text":rt(seg)}})
+            blocks.append({"object": "block", "paragraph": {"rich_text": rt(seg)}})
         buf.clear()
+
     for raw in io.StringIO(md_text):
-        s=raw.rstrip("\n")
+        s = raw.rstrip("\n")
         if s.startswith("# "):
-            flush(); blocks.append({"object":"block","heading_1":{"rich_text":rt(s[2:].strip())}})
+            flush()
+            blocks.append(
+                {"object": "block", "heading_1": {"rich_text": rt(s[2:].strip())}}
+            )
         elif s.startswith("## "):
-            flush(); blocks.append({"object":"block","heading_2":{"rich_text":rt(s[3:].strip())}})
-        elif s.strip()=="":
+            flush()
+            blocks.append(
+                {"object": "block", "heading_2": {"rich_text": rt(s[3:].strip())}}
+            )
+        elif s.strip() == "":
             flush()
         else:
             buf.append(s)
     flush()
     return blocks
 
+
 def fenced_markdown_blocks(full_md):
-    out=[]; lines=full_md.splitlines(); i=0; last_label=None
-    while i<len(lines):
+    out = []
+    lines = full_md.splitlines()
+    i = 0
+    last_label = None
+    while i < len(lines):
         if lines[i].strip().startswith("###"):
             last_label = lines[i].strip("# ").strip()
         if lines[i].strip().lower().startswith("```markdown"):
-            j=i+1; buf=[]
-            while j<len(lines) and not lines[j].strip().startswith("```"):
-                buf.append(lines[j]); j+=1
-            title_guess=None
+            j = i + 1
+            buf = []
+            while j < len(lines) and not lines[j].strip().startswith("```"):
+                buf.append(lines[j])
+                j += 1
+            title_guess = None
             for b in buf:
-                if b.startswith("# "):  title_guess=b[2:].strip(); break
-                if b.startswith("## "): title_guess=b[3:].strip(); break
+                if b.startswith("# "):
+                    title_guess = b[2:].strip()
+                    break
+                if b.startswith("## "):
+                    title_guess = b[3:].strip()
+                    break
             out.append((title_guess or last_label or "Untitled", "\n".join(buf)))
-            i=j
-        i+=1
+            i = j
+        i += 1
     return out
 
+
 def ensure_child_page(c, parent_id, title):
-    kids=c.blocks.children.list(parent_id).get("results",[])
+    kids = c.blocks.children.list(parent_id).get("results", [])
     for k in kids:
-        if k.get("type")=="child_page" and k["child_page"].get("title")==title:
+        if k.get("type") == "child_page" and k["child_page"].get("title") == title:
             return k["id"]
-    p=c.pages.create(parent={"type":"page_id","page_id":parent_id},
-                     properties={"title":{"title":rt(title)}})
+    p = c.pages.create(
+        parent={"type": "page_id", "page_id": parent_id},
+        properties={"title": {"title": rt(title)}},
+    )
     return p["id"]
 
+
 def clear_children(c, page_id):
-    kids=c.blocks.children.list(page_id).get("results",[])
+    kids = c.blocks.children.list(page_id).get("results", [])
     for k in kids:
-        try: c.blocks.delete(k["id"])
-        except Exception: pass
+        try:
+            c.blocks.delete(k["id"])
+        except Exception:
+            pass
+
 
 def append_blocks_batched(c, page_id, blocks, batch=90):
     for i in range(0, len(blocks), batch):
-        c.blocks.children.append(page_id, children=blocks[i:i+batch])
+        c.blocks.children.append(page_id, children=blocks[i : i + batch])
+
 
 def main():
     # SoT guard
-    mode=json.load(open(SOT,"r",encoding=ENC))
+    mode = json.load(open(SOT, "r", encoding=ENC))
     if not mode.get("import_enabled"):
-        raise SystemExit("Import disabled by SoT guard. Set import_enabled:true to bootstrap once.")
+        raise SystemExit(
+            "Import disabled by SoT guard. Set import_enabled:true to bootstrap once."
+        )
 
-    m=json.load(open(MAN,"r",encoding=ENC))
-    c=Client(auth=os.environ["NOTION_TOKEN"])
+    m = json.load(open(MAN, "r", encoding=ENC))
+    c = Client(auth=os.environ["NOTION_TOKEN"])
 
-    hub=json.load(open(MAP,"r",encoding=ENC))["hub_page_id"]
+    hub = json.load(open(MAP, "r", encoding=ENC))["hub_page_id"]
 
     # Sections
-    sot_docs_pg    = ensure_child_page(c, hub, "SoT Docs")
-    spine_pg       = ensure_child_page(c, hub, "14-Step Spine")
-    core_ml_hub_pg = ensure_child_page(c, hub, m["sections"]["Core_ML_Phase6"]["hub_title"])
-    tqc_hub_pg     = ensure_child_page(c, hub, m["sections"]["Telemetry_QC"]["hub_title"])
+    sot_docs_pg = ensure_child_page(c, hub, "SoT Docs")
+    spine_pg = ensure_child_page(c, hub, "14-Step Spine")
+    core_ml_hub_pg = ensure_child_page(
+        c, hub, m["sections"]["Core_ML_Phase6"]["hub_title"]
+    )
+    tqc_hub_pg = ensure_child_page(c, hub, m["sections"]["Telemetry_QC"]["hub_title"])
 
     # SoT Docs
     for doc in m["sections"]["SoT_Docs"]:
-        path=doc["file"]; title=doc["notion_title"]
-        if not pathlib.Path(path).exists(): continue
-        page=ensure_child_page(c, sot_docs_pg, title)
+        path = doc["file"]
+        title = doc["notion_title"]
+        if not pathlib.Path(path).exists():
+            continue
+        page = ensure_child_page(c, sot_docs_pg, title)
         clear_children(c, page)
-        md=open(path,"r",encoding=ENC).read()
+        md = open(path, "r", encoding=ENC).read()
         append_blocks_batched(c, page, md_to_blocks(md))
         print("SoT Doc ", title)
 
     # 14-Step spine
     for s in m["sections"]["Steps"]:
-        path=s["file"]; step_title=s["page_title"]
-        if not pathlib.Path(path).exists(): continue
-        full=open(path,"r",encoding=ENC).read()
+        path = s["file"]
+        step_title = s["page_title"]
+        if not pathlib.Path(path).exists():
+            continue
+        full = open(path, "r", encoding=ENC).read()
         step_page = ensure_child_page(c, spine_pg, step_title)
 
         blocks = fenced_markdown_blocks(full)
         parent_blocks = md_to_blocks(blocks[0][1]) if blocks else []
-        child_blocks  = [md_to_blocks(b[1]) for b in blocks[1:]] if blocks else []
+        child_blocks = [md_to_blocks(b[1]) for b in blocks[1:]] if blocks else []
 
         p01 = ensure_child_page(c, step_page, "01  Narrative & Intent")
         clear_children(c, p01)
         if parent_blocks:
             append_blocks_batched(c, p01, parent_blocks)
 
-        mstep=re.match(r"Step (\d{2})", step_title)
+        mstep = re.match(r"Step (\d{2})", step_title)
         nn = mstep.group(1) if mstep else "NN"
         for i, cb in enumerate(child_blocks, start=1):
-            child_title_guess = blocks[i][0] if i<len(blocks) else None
+            child_title_guess = blocks[i][0] if i < len(blocks) else None
             child_title = f"{nn}.{i}  {child_title_guess or 'Section'}"
             ch = ensure_child_page(c, step_page, child_title)
             clear_children(c, ch)
@@ -142,8 +188,19 @@ def main():
     if pathlib.Path(cm["file"]).exists():
         phase6 = ensure_child_page(c, core_ml_hub_pg, cm["page_title"])
         clear_children(c, phase6)
-        txt=open(cm["file"],"r",encoding=ENC).read()
-        note=[{"object":"block","callout":{"icon":{"type":"emoji","emoji":"ℹ"},"rich_text":rt("Related Steps: " + ", ".join([f"{n:02d}" for n in cm["related_steps"]]))}}]
+        txt = open(cm["file"], "r", encoding=ENC).read()
+        note = [
+            {
+                "object": "block",
+                "callout": {
+                    "icon": {"type": "emoji", "emoji": "ℹ"},
+                    "rich_text": rt(
+                        "Related Steps: "
+                        + ", ".join([f"{n:02d}" for n in cm["related_steps"]])
+                    ),
+                },
+            }
+        ]
         append_blocks_batched(c, phase6, note + md_to_blocks(txt))
         print("Core ML Phase 6  applied")
 
@@ -152,12 +209,24 @@ def main():
     if pathlib.Path(tq["file"]).exists():
         qc = ensure_child_page(c, tqc_hub_pg, tq["page_title"])
         clear_children(c, qc)
-        txt=open(tq["file"],"r",encoding=ENC).read()
-        note=[{"object":"block","callout":{"icon":{"type":"emoji","emoji":"ℹ"},"rich_text":rt("Related Steps: " + ", ".join([f"{n:02d}" for n in tq["related_steps"]]))}}]
+        txt = open(tq["file"], "r", encoding=ENC).read()
+        note = [
+            {
+                "object": "block",
+                "callout": {
+                    "icon": {"type": "emoji", "emoji": "ℹ"},
+                    "rich_text": rt(
+                        "Related Steps: "
+                        + ", ".join([f"{n:02d}" for n in tq["related_steps"]])
+                    ),
+                },
+            }
+        ]
         append_blocks_batched(c, qc, note + md_to_blocks(txt))
         print("Telemetry & QC (V1)  applied")
 
     print("Apply complete. Lock SoT next.")
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     main()

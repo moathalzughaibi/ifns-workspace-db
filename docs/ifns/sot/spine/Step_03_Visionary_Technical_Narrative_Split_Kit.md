@@ -46,7 +46,7 @@ Each child page should appear as a Notion subpage under this one.
 
 IFNS introduces SxE as an explicit architectural layer, not an afterthought. SxE is the contract between:
 
-- The **Core ML engine** (data, features, models, backtests, risk logic, execution), and  
+- The **Core ML engine** (data, features, models, backtests, risk logic, execution), and
 - The **operator experiences** (Mirror, Admin, consoles, reports).
 
 The purpose of SxE is to ensure that every important internal object—datasets, models, backtests, KPIs, risk envelopes, sessions, incidents—has:

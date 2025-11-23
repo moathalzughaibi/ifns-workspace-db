@@ -1,0 +1,15 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Export & Commit mirrors",
+      "type": "shell",
+      "command": "powershell -ExecutionPolicy Bypass -File .\\scripts\\export_and_commit.ps1"
+    },
+    {
+      "label": "Verify SoT Pages",
+      "type": "shell",
+      "command": "powershell -ExecutionPolicy Bypass -File .\\scripts\\run_and_capture.ps1 -Command \"python .\\scripts\\check_sot_landing.py\" -Tag \"check_sot\""
+    }
+  ]
+}

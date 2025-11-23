@@ -1,0 +1,104 @@
+asset_type,file_name,new_rel_path,notion_target_type,notion_target_name,notion_parent_page
+table,Backtest_Results_Table.csv,sync\ifns\Backtest_Results_Table.csv,db,Backtest_Results,IFNS – Runtime & Telemetry
+table,calendar_gaps_2025.json,sync\ifns\calendar_gaps_2025.json,file,Runtime_Schemas,IFNS – Runtime & Telemetry
+table,clip_events_schema_v1.json,sync\ifns\clip_events_schema_v1.json,file,Runtime_Schemas,IFNS – Runtime & Telemetry
+table,clip_events_sample.ndjson,sync\ifns\examples\clip_events_sample.ndjson,file,Runtime_Schemas,IFNS – Runtime & Telemetry
+table,feature_view_D1_demo.csv,sync\ifns\examples\feature_view_D1_demo.csv,db,Feature_Views,IFNS – Feature Views & QC
+table,feature_view_H1_demo.csv,sync\ifns\examples\feature_view_H1_demo.csv,db,Feature_Views,IFNS – Feature Views & QC
+table,indicator_feature_schema_d1_demo.csv,sync\ifns\examples\indicator_feature_schema_d1_demo.csv,db,Feature_Schema,IFNS – Feature Schema & Policy
+table,indicator_feature_schema_h1_demo.csv,sync\ifns\examples\indicator_feature_schema_h1_demo.csv,db,Feature_Schema,IFNS – Feature Schema & Policy
+table,training_manifest_D1_demo.json,sync\ifns\examples\training_manifest_D1_demo.json,file,Runtime_Schemas,IFNS – Runtime & Telemetry
+table,training_manifest_H1_demo.json,sync\ifns\examples\training_manifest_H1_demo.json,file,Runtime_Schemas,IFNS – Runtime & Telemetry
+table,Execution_API_Log.csv,sync\ifns\Execution_API_Log.csv,db,Execution_API_Log,IFNS – Runtime & Telemetry
+table,Experiment_Logs.csv,sync\ifns\Experiment_Logs.csv,db,Experiment_Logs,IFNS – Runtime & Telemetry
+table,feature_family_map.csv,sync\ifns\feature_family_map.csv,db,Feature_Family_Map,IFNS – Feature Schema & Policy
+table,feature_policy_matrix.csv,sync\ifns\feature_policy_matrix.csv,db,Feature_Policy_Matrix,IFNS – Feature Schema & Policy
+table,indicator_feature_schema_h1_v1_with_family.csv,sync\ifns\indicator_feature_schema_h1_v1_with_family.csv,db,Feature_Schema,IFNS – Feature Schema & Policy
+table,indicator_feature_schema_v1.csv,sync\ifns\indicator_feature_schema_v1.csv,db,Feature_Schema,IFNS – Feature Schema & Policy
+table,indicator_feature_schema_v1_with_family.csv,sync\ifns\indicator_feature_schema_v1_with_family.csv,db,Feature_Schema,IFNS – Feature Schema & Policy
+table,indicators_catalog_L1_phase3.csv,sync\ifns\indicators_catalog_L1_phase3.csv,db,Indicators_L1_Catalog,IFNS – Indicators Library
+table,indicators_catalog_L2L3_phase4.csv,sync\ifns\indicators_catalog_L2L3_phase4.csv,db,Indicators_L2L3_Catalog,IFNS – Indicators Library
+table,indicators_universe_catalog_phase2.csv,sync\ifns\indicators_universe_catalog_phase2.csv,db,Indicators_Universe,IFNS – Indicators Library
+table,lint_report.csv,sync\ifns\lint_report.csv,db,QC_Lint_Report,IFNS – Feature Views & QC
+table,lint_report.json,sync\ifns\lint_report.json,db,QC_Lint_Report,IFNS – Feature Views & QC
+table,Model_Registry.csv,sync\ifns\Model_Registry.csv,db,Model_Registry,IFNS – Runtime & Telemetry
+table,Portfolio_Matrix.csv,sync\ifns\Portfolio_Matrix.csv,db,Portfolio_Matrix,IFNS – Runtime & Telemetry
+table,qc_weekly_example_v1.ndjson,sync\ifns\qc_weekly_example_v1.ndjson,file,Runtime_Schemas,IFNS – Runtime & Telemetry
+table,qc_weekly_schema_v1.json,sync\ifns\qc_weekly_schema_v1.json,file,Runtime_Schemas,IFNS – Runtime & Telemetry
+table,RiskAPI_Alerts.csv,sync\ifns\RiskAPI_Alerts.csv,db,RiskAPI_Alerts,IFNS – Runtime & Telemetry
+table,System_Layers_Tracker.csv,sync\ifns\System_Layers_Tracker.csv,db,System_Layers_Tracker,IFNS – Runtime & Telemetry
+table,test_assertions_manifest.json,sync\ifns\test_assertions_manifest.json,file,Runtime_Schemas,IFNS – Runtime & Telemetry
+table,training_manifest_D1_v1_1.json,sync\ifns\training_manifest_D1_v1_1.json,file,Runtime_Schemas,IFNS – Runtime & Telemetry
+table,training_manifest_H1_v1_0.json,sync\ifns\training_manifest_H1_v1_0.json,file,Runtime_Schemas,IFNS – Runtime & Telemetry
+doc,Conceptual_Framework.md,docs\ifns_legacy\Conceptual_Framework.md,page,Conceptual & Operational Frameworks,IFNS – Legacy Deep Spec
+doc,Repo_Inventory_and_Git-Notion_Crosswalk_autopilot-notion-ops_2025_11_19.md,docs\ifns_legacy\crosswalks\Repo_Inventory_and_Git-Notion_Crosswalk_autopilot-notion-ops_2025_11_19.md,page,SoT & Migration Notes,IFNS – Legacy Deep Spec
+doc,Dashboard_Analytics.md,docs\ifns_legacy\Dashboard_Analytics.md,page,UI & Dashboard Drafts,IFNS – Legacy Deep Spec
+doc,Phase_0_Autopilot_Hub_Inventory.md,docs\ifns_legacy\handover\Phase_0_Autopilot_Hub_Inventory.md,page,Indicators – Design (Phases 1–7),IFNS – Legacy Deep Spec
+doc,Phase_1_IFNS_14-Step_Spine_and_Hub_Structure.md,docs\ifns_legacy\handover\Phase_1_IFNS_14-Step_Spine_and_Hub_Structure.md,page,Indicators – Design (Phases 1–7),IFNS – Legacy Deep Spec
+doc,Phase_2_Attach_UI_Master_V2_to_14-Step_Spine.md,docs\ifns_legacy\handover\Phase_2_Attach_UI_Master_V2_to_14-Step_Spine.md,page,Indicators – Design (Phases 1–7),IFNS – Legacy Deep Spec
+doc,Phase_3_Telemetry_QC_Runtime_and_Calendar_Wiring.md,docs\ifns_legacy\handover\Phase_3_Telemetry_QC_Runtime_and_Calendar_Wiring.md,page,Indicators – Design (Phases 1–7),IFNS – Legacy Deep Spec
+doc,Phase_4_Catalog_and_Feature_Universe_Surfaces.md,docs\ifns_legacy\handover\Phase_4_Catalog_and_Feature_Universe_Surfaces.md,page,Indicators – Design (Phases 1–7),IFNS – Legacy Deep Spec
+doc,Phase_5_Living_SoT_Rules_and_V1_Crosswalk.md,docs\ifns_legacy\handover\Phase_5_Living_SoT_Rules_and_V1_Crosswalk.md,page,Indicators – Design (Phases 1–7),IFNS – Legacy Deep Spec
+doc,IFNS_UI_Drafts_and_Working_Notes_v2.md,docs\ifns_legacy\IFNS_UI_Drafts_and_Working_Notes_v2.md,page,UI & Dashboard Drafts,IFNS – Legacy Deep Spec
+doc,IFNS_UI_Master_Summary_v2.md,docs\ifns_legacy\IFNS_UI_Master_Summary_v2.md,page,UI & Dashboard Drafts,IFNS – Legacy Deep Spec
+doc,IFNS_UI_Steps_Index_v2.md,docs\ifns_legacy\IFNS_UI_Steps_Index_v2.md,page,Unsorted Legacy Docs,IFNS – Legacy Deep Spec
+doc,Phase1_Taxonomy_Governance.md,docs\ifns_legacy\indicators\checklists\Phase1_Taxonomy_Governance.md,page,Indicators – Design (Phases 1–7),IFNS – Legacy Deep Spec
+doc,Phase2_Indicator_Universe.md,docs\ifns_legacy\indicators\checklists\Phase2_Indicator_Universe.md,page,Indicators – Design (Phases 1–7),IFNS – Legacy Deep Spec
+doc,Phase3_L1_Catalog.md,docs\ifns_legacy\indicators\checklists\Phase3_L1_Catalog.md,page,Indicators – Design (Phases 1–7),IFNS – Legacy Deep Spec
+doc,Phase4_L2L3_Frameworks.md,docs\ifns_legacy\indicators\checklists\Phase4_L2L3_Frameworks.md,page,Indicators – Design (Phases 1–7),IFNS – Legacy Deep Spec
+doc,Phase5_Feature_Output_Digitization.md,docs\ifns_legacy\indicators\checklists\Phase5_Feature_Output_Digitization.md,page,Indicators – Design (Phases 1–7),IFNS – Legacy Deep Spec
+doc,Phase6_Implementation_Runtime.md,docs\ifns_legacy\indicators\checklists\Phase6_Implementation_Runtime.md,page,Indicators – Design (Phases 1–7),IFNS – Legacy Deep Spec
+doc,Phase7_ML_Integration_Operations.md,docs\ifns_legacy\indicators\checklists\Phase7_ML_Integration_Operations.md,page,Indicators – Design (Phases 1–7),IFNS – Legacy Deep Spec
+doc,CI_Guard.md,docs\ifns_legacy\indicators\CI_Guard.md,page,Tooling & CI,IFNS – Legacy Deep Spec
+doc,Feature_Family_and_Pytest_Starter.md,docs\ifns_legacy\indicators\Feature_Family_and_Pytest_Starter.md,page,Tooling & CI,IFNS – Legacy Deep Spec
+doc,Feature_Policy_Matrix.md,docs\ifns_legacy\indicators\Feature_Policy_Matrix.md,page,Unsorted Legacy Docs,IFNS – Legacy Deep Spec
+doc,Indicators_Feature_Schema_Phase5.md,docs\ifns_legacy\indicators\Indicators_Feature_Schema_Phase5.md,page,Indicators – Design (Phases 1–7),IFNS – Legacy Deep Spec
+doc,Indicators_Implementation_Templates_Phase6.md,docs\ifns_legacy\indicators\Indicators_Implementation_Templates_Phase6.md,page,Indicators – Design (Phases 1–7),IFNS – Legacy Deep Spec
+doc,Indicators_L1_Catalog_Phase3.md,docs\ifns_legacy\indicators\Indicators_L1_Catalog_Phase3.md,page,Indicators – Design (Phases 1–7),IFNS – Legacy Deep Spec
+doc,Indicators_L2L3_Catalog_Phase4.md,docs\ifns_legacy\indicators\Indicators_L2L3_Catalog_Phase4.md,page,Indicators – Design (Phases 1–7),IFNS – Legacy Deep Spec
+doc,Indicators_Master_Index_Phases_1_to_7.md,docs\ifns_legacy\indicators\Indicators_Master_Index_Phases_1_to_7.md,page,Indicators – Design (Phases 1–7),IFNS – Legacy Deep Spec
+doc,Indicators_ML_Integration_Phase7.md,docs\ifns_legacy\indicators\Indicators_ML_Integration_Phase7.md,page,Indicators – Design (Phases 1–7),IFNS – Legacy Deep Spec
+doc,Indicators_Taxonomy_Phase1.md,docs\ifns_legacy\indicators\Indicators_Taxonomy_Phase1.md,page,Indicators – Design (Phases 1–7),IFNS – Legacy Deep Spec
+doc,Indicators_Universe_Phase2.md,docs\ifns_legacy\indicators\Indicators_Universe_Phase2.md,page,Indicators – Design (Phases 1–7),IFNS – Legacy Deep Spec
+doc,IO_Utilities_and_Synthetic_Inputs.md,docs\ifns_legacy\indicators\IO_Utilities_and_Synthetic_Inputs.md,page,Unsorted Legacy Docs,IFNS – Legacy Deep Spec
+doc,Manifest_Diff_Tool.md,docs\ifns_legacy\indicators\Manifest_Diff_Tool.md,page,Tooling & CI,IFNS – Legacy Deep Spec
+doc,Manifests_with_Family_and_Linter.md,docs\ifns_legacy\indicators\Manifests_with_Family_and_Linter.md,page,Tooling & CI,IFNS – Legacy Deep Spec
+doc,QC_Weekly_ETL_Clip_Integration.md,docs\ifns_legacy\indicators\QC_Weekly_ETL_Clip_Integration.md,page,QC & Calendars,IFNS – Legacy Deep Spec
+doc,QC_Weekly_ETL_Skeleton.md,docs\ifns_legacy\indicators\QC_Weekly_ETL_Skeleton.md,page,QC & Calendars,IFNS – Legacy Deep Spec
+doc,QC_Weekly_Telemetry_V1.md,docs\ifns_legacy\indicators\QC_Weekly_Telemetry_V1.md,page,QC & Calendars,IFNS – Legacy Deep Spec
+doc,Soft_Clipping_and_Calendars.md,docs\ifns_legacy\indicators\Soft_Clipping_and_Calendars.md,page,QC & Calendars,IFNS – Legacy Deep Spec
+doc,Unit_Test_Scaffolds.md,docs\ifns_legacy\indicators\Unit_Test_Scaffolds.md,page,Tooling & CI,IFNS – Legacy Deep Spec
+doc,Operational_Framework.md,docs\ifns_legacy\Operational_Framework.md,page,Conceptual & Operational Frameworks,IFNS – Legacy Deep Spec
+doc,Reference_Library.md,docs\ifns_legacy\Reference_Library.md,page,Unsorted Legacy Docs,IFNS – Legacy Deep Spec
+doc,CalendarGaps2025_views.md,docs\ifns_legacy\saved_views\CalendarGaps2025_views.md,page,QC & Calendars,IFNS – Legacy Deep Spec
+doc,CatalogL1_views.md,docs\ifns_legacy\saved_views\CatalogL1_views.md,page,Indicators – Design (Phases 1–7),IFNS – Legacy Deep Spec
+doc,CatalogL2L3_views.md,docs\ifns_legacy\saved_views\CatalogL2L3_views.md,page,Indicators – Design (Phases 1–7),IFNS – Legacy Deep Spec
+doc,FamilyMap_views.md,docs\ifns_legacy\saved_views\FamilyMap_views.md,page,QC & Calendars,IFNS – Legacy Deep Spec
+doc,FeatureSchemaH1_views.md,docs\ifns_legacy\saved_views\FeatureSchemaH1_views.md,page,QC & Calendars,IFNS – Legacy Deep Spec
+doc,FeatureSchemaV1_views.md,docs\ifns_legacy\saved_views\FeatureSchemaV1_views.md,page,QC & Calendars,IFNS – Legacy Deep Spec
+doc,PolicyMatrix_views.md,docs\ifns_legacy\saved_views\PolicyMatrix_views.md,page,QC & Calendars,IFNS – Legacy Deep Spec
+doc,QCWeekly_views.md,docs\ifns_legacy\saved_views\QCWeekly_views.md,page,QC & Calendars,IFNS – Legacy Deep Spec
+doc,UniverseP2_views.md,docs\ifns_legacy\saved_views\UniverseP2_views.md,page,QC & Calendars,IFNS – Legacy Deep Spec
+doc,Stage_00_Document_Overview.md,docs\ifns_legacy\stages\Stage_00_Document_Overview.md,page,Stages 0–7 – ML Lifecycle,IFNS – Legacy Deep Spec
+doc,Stage_01_Foundations_and_Architecture.md,docs\ifns_legacy\stages\Stage_01_Foundations_and_Architecture.md,page,Stages 0–7 – ML Lifecycle,IFNS – Legacy Deep Spec
+doc,Stage_02_Data_and_Feature_Pipeline.md,docs\ifns_legacy\stages\Stage_02_Data_and_Feature_Pipeline.md,page,Stages 0–7 – ML Lifecycle,IFNS – Legacy Deep Spec
+doc,Stage_03_Modeling_and_Training.md,docs\ifns_legacy\stages\Stage_03_Modeling_and_Training.md,page,Stages 0–7 – ML Lifecycle,IFNS – Legacy Deep Spec
+doc,Stage_04_Backtesting_and_Evaluation.md,docs\ifns_legacy\stages\Stage_04_Backtesting_and_Evaluation.md,page,Stages 0–7 – ML Lifecycle,IFNS – Legacy Deep Spec
+doc,Stage_05_Risk_Execution_and_SxE_Link.md,docs\ifns_legacy\stages\Stage_05_Risk_Execution_and_SxE_Link.md,page,Stages 0–7 – ML Lifecycle,IFNS – Legacy Deep Spec
+doc,Stage_06_Paper_Trading.md,docs\ifns_legacy\stages\Stage_06_Paper_Trading.md,page,Stages 0–7 – ML Lifecycle,IFNS – Legacy Deep Spec
+doc,Stage_07_Live_Trading_and_Operations.md,docs\ifns_legacy\stages\Stage_07_Live_Trading_and_Operations.md,page,Stages 0–7 – ML Lifecycle,IFNS – Legacy Deep Spec
+doc,Step_01_Preface_Integration.md,docs\ifns_legacy\Step_01_Preface_Integration.md,page,Unsorted Legacy Docs,IFNS – Legacy Deep Spec
+doc,Step_02_Executive_Summary.md,docs\ifns_legacy\Step_02_Executive_Summary.md,page,Unsorted Legacy Docs,IFNS – Legacy Deep Spec
+doc,Step_03_Visionary_Technical_Overview.md,docs\ifns_legacy\Step_03_Visionary_Technical_Overview.md,page,Unsorted Legacy Docs,IFNS – Legacy Deep Spec
+doc,Step_04_Preface_Timeline.md,docs\ifns_legacy\Step_04_Preface_Timeline.md,page,Unsorted Legacy Docs,IFNS – Legacy Deep Spec
+doc,Step_05_Introduction_Operational_Genesis.md,docs\ifns_legacy\Step_05_Introduction_Operational_Genesis.md,page,Unsorted Legacy Docs,IFNS – Legacy Deep Spec
+doc,Step_06_System_Architecture.md,docs\ifns_legacy\Step_06_System_Architecture.md,page,Unsorted Legacy Docs,IFNS – Legacy Deep Spec
+doc,Step_07_Data_Intelligence_Layer_DIL.md,docs\ifns_legacy\Step_07_Data_Intelligence_Layer_DIL.md,page,Unsorted Legacy Docs,IFNS – Legacy Deep Spec
+doc,Step_08_Modeling_Intelligence_MI.md,docs\ifns_legacy\Step_08_Modeling_Intelligence_MI.md,page,Unsorted Legacy Docs,IFNS – Legacy Deep Spec
+doc,Step_09_Execution_Intelligence_EI.md,docs\ifns_legacy\Step_09_Execution_Intelligence_EI.md,page,Unsorted Legacy Docs,IFNS – Legacy Deep Spec
+doc,Step_10_Market_Structural_Awareness_MSA.md,docs\ifns_legacy\Step_10_Market_Structural_Awareness_MSA.md,page,Unsorted Legacy Docs,IFNS – Legacy Deep Spec
+doc,Step_11_Model_and_Signal_Integration_MSI.md,docs\ifns_legacy\Step_11_Model_and_Signal_Integration_MSI.md,page,Unsorted Legacy Docs,IFNS – Legacy Deep Spec
+doc,Step_12_Decision_and_Risk_Architecture_DRA.md,docs\ifns_legacy\Step_12_Decision_and_Risk_Architecture_DRA.md,page,Unsorted Legacy Docs,IFNS – Legacy Deep Spec
+doc,Step_13_Self_Evaluation_and_Learning_SEL.md,docs\ifns_legacy\Step_13_Self_Evaluation_and_Learning_SEL.md,page,Unsorted Legacy Docs,IFNS – Legacy Deep Spec
+doc,Step_14_Advanced_Awareness_and_Quantum_Cognition.md,docs\ifns_legacy\Step_14_Advanced_Awareness_and_Quantum_Cognition.md,page,Unsorted Legacy Docs,IFNS – Legacy Deep Spec
+doc,Wireframe.md,docs\ifns_legacy\Wireframe.md,page,UI & Dashboard Drafts,IFNS – Legacy Deep Spec

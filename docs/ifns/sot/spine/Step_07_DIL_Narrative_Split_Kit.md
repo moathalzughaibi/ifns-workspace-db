@@ -1,7 +1,7 @@
 # Step 07 – DIL Narrative Split Kit
 
-This file helps you break the long **`01 – Narrative & Intent`** page for Step 07 – Data Intelligence Layer (DIL) 
-into smaller child pages in Notion. All content below is taken from your existing Notion export and regrouped only 
+This file helps you break the long **`01 – Narrative & Intent`** page for Step 07 – Data Intelligence Layer (DIL)
+into smaller child pages in Notion. All content below is taken from your existing Notion export and regrouped only
 by headings.
 
 ## A. Parent page – `01 – Narrative & Intent` (new layout)
